@@ -1,23 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import Header from "./components/Header";
+import Hero from "./components/Hero";
+import Button from "./components/Button";
 
 function App() {
+  const [screen, setScreen] = useState("landing");
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <Header />
+
+      {screen === "landing" && (
+        <>
+          <Hero />
+          <Button
+            text="Start Interview"
+            onClick={() => setScreen("intro")}
+          />
+        </>
+      )}
+
+      {screen === "intro" && (
+        <div>
+          <h2>Interview Instructions</h2>
+          <p>You will answer 5 questions. Each question has a time limit.</p>
+          <Button
+            text="Begin Interview"
+            onClick={() => alert("Interview starts tomorrow")}
+          />
+        </div>
+      )}
     </div>
   );
 }
