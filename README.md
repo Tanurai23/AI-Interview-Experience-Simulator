@@ -73,14 +73,25 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 # AI-Interview-Experience-Simulator
 A realistic AI Interview Simulator built with React/Next.js and TailwindCSS. Features timed mock interviews and efficient state management
 
-Key Features
-⚡ Modern Architecture: Built with [React / Next.js] for a fast, server-rendered (if Next.js) user experience.
+## 🚀 Live Demo
+https://ai-interview-simulator.vercel.app
 
-🎨 Responsive Design: A clean, mobile-first interface styled with TailwindCSS.
+## 🛠 Tech Stack
+- React
+- Zustand
+- Tailwind CSS
+- Chart.js
+- Vercel (Deployment)
 
-⏱️ Timed Assessments: Custom Timer Logic implementation to simulate real interview pressure constraints.
+## ✨ Features
+- Timed interview simulation
+- Keyboard shortcuts
+- Analytics dashboard
+- Session history
+- Dark mode
 
-🗂️ Global State Management: seamless data flow across components using [Context API / Zustand].
-
-🔄 Dynamic Mock Data: Simulates backend interactions using Mock API / JSON to serve varied interview questions.
+## 📦 Installation
+```bash
+npm install
+npm start
 >>>>>>> 5c779cc10eb4bd083133d49ad8b5470c81acb5ab
