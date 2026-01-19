@@ -1,36 +1,105 @@
 import { useState } from "react";
+import Home from "./pages/Home";
+import InterviewIntro from "./components/InterviewIntro";
+import InterviewScreen from "./components/InterviewScreen";
+import ResultScreen from "./components/ResultScreen";
+import HistoryScreen from "./components/HistoryScreen";
+import AnalyticsScreen from "./components/AnalyticsScreen";
 import Header from "./components/Header";
-import Hero from "./components/Hero";
-import Button from "./components/Button";
+import interviewConfig from "./data/interviewConfig";
+import questions from "./data/questions";
+import { motion, AnimatePresence } from "framer-motion";
+
 
 function App() {
   const [screen, setScreen] = useState("landing");
 
+  const renderContent = () => {
+    switch (screen) {
+      case "landing":
+        return (
+          <Home
+            onStartInterview={() => setScreen("intro")}
+            onAnalytics={() => setScreen("analytics")}
+          />
+        );
+
+      case "intro":
+        return (
+          <InterviewIntro
+            config={interviewConfig}
+            onStart={() => setScreen("interview")}
+          />
+        );
+
+      case "interview":
+        return (
+          <InterviewScreen
+            questions={questions}
+            onFinish={() => setScreen("complete")}
+          />
+        );
+
+      case "complete":
   return (
-    <div className="app">
-      <Header />
+    <ResultScreen
+      onRestart={() => setScreen("landing")}
+      onAnalytics={() => setScreen("analytics")}
+    />
+  );
 
-      {screen === "landing" && (
-        <>
-          <Hero />
-          <Button
-            text="Start Interview"
-            onClick={() => setScreen("intro")}
-          />
-        </>
-      )}
+      case "history":
+        return <HistoryScreen />;
 
-      {screen === "intro" && (
-        <div>
-          <h2>Interview Instructions</h2>
-          <p>You will answer 5 questions. Each question has a time limit.</p>
-          <Button
-            text="Begin Interview"
-            onClick={() => alert("Interview starts tomorrow")}
-          />
-        </div>
+      case "analytics":
+  return (
+    <AnalyticsScreen onBack={() => setScreen("landing")} />
+  );
+
+
+      default:
+        return <div>Screen not found</div>;
+    }
+  };
+
+return (
+  <div className="min-h-screen bg-gray-50 flex flex-col">
+    
+    {/* HEADER */}
+    <Header
+      currentScreen={screen}
+      onHome={() => setScreen("landing")}
+    />
+
+      <main className="flex justify-center px-4 py-12">
+  <AnimatePresence mode="wait">
+    <motion.div
+      key={screen}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.4, ease: "easeInOut" }}
+      className="w-full flex justify-center"
+    >
+      {renderContent()}
+    </motion.div>
+  </AnimatePresence>
+</main>
+
+
+      {screen !== "landing" && screen !== "interview" && (
+        <footer className="text-center pb-6">
+          <button
+            onClick={() => setScreen("history")}
+            className="text-xs text-gray-500 hover:text-gray-700"
+          >
+            View History
+          </button>
+        </footer>
       )}
+      
     </div>
+    
   );
 }
 

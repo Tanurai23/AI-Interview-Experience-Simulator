@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -68,3 +69,18 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+=======
+# AI-Interview-Experience-Simulator
+A realistic AI Interview Simulator built with React/Next.js and TailwindCSS. Features timed mock interviews and efficient state management
+
+Key Features
+⚡ Modern Architecture: Built with [React / Next.js] for a fast, server-rendered (if Next.js) user experience.
+
+🎨 Responsive Design: A clean, mobile-first interface styled with TailwindCSS.
+
+⏱️ Timed Assessments: Custom Timer Logic implementation to simulate real interview pressure constraints.
+
+🗂️ Global State Management: seamless data flow across components using [Context API / Zustand].
+
+🔄 Dynamic Mock Data: Simulates backend interactions using Mock API / JSON to serve varied interview questions.
+>>>>>>> 5c779cc10eb4bd083133d49ad8b5470c81acb5ab
