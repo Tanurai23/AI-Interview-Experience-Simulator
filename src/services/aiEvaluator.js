@@ -1,7 +1,4 @@
-import {
-  scoreAnswerWithRules,
-  getAnswerQuality,
-} from "../utils/answerScoring";
+// Removed unused scoring utility imports to fix Vercel build errors
 
 export const evaluateAnswer = async (question, answer) => {
   const response = await fetch("/api/evaluate", {
@@ -10,14 +7,19 @@ export const evaluateAnswer = async (question, answer) => {
     body: JSON.stringify({ question, answer }),
   });
 
+  if (!response.ok) {
+    throw new Error("Failed to fetch evaluation from AI service");
+  }
+
   return response.json();
 };
+
 export const formatFeedbackSTAR = (question, aiFeedback) => {
   return {
-    situation: "Briefly describe the scenario in your answer",
-    task: "State the task or goal clearly",
-    action: "Explain steps you took or skills used",
-    result: "Show outcome or learning points",
+    situation: "Analysis of the context provided in the response.",
+    task: "The specific challenge identified by the AI.",
+    action: "The actions and skills demonstrated in the answer.",
+    result: "The final outcome and impact analyzed by the AI.",
     aiSummary: aiFeedback,
   };
 };
