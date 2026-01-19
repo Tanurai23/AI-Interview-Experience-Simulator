@@ -7,7 +7,7 @@ const InterviewScreen = ({ onFinish }) => {
   const textareaRef = useRef(null);
   const [timeLeft, setTimeLeft] = useState(60);
   const [answer, setAnswer] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // New: Loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     currentIndex,
@@ -21,40 +21,48 @@ const InterviewScreen = ({ onFinish }) => {
   // ---------- HANDLE NEXT ----------
   const handleNext = useCallback(
     async (isAutoSubmit = false) => {
+      // 1. Prevent action if answer is empty (unless timer ran out) or already loading
       if (!isAutoSubmit && !answer.trim()) return;
-      if (isLoading) return; // Prevent double clicks
+      if (isLoading) return; 
 
-      setIsLoading(true); // Start loading
+      setIsLoading(true);
 
       try {
-        // 1. Start the API call
+        // 2. Call AI API
         const evaluation = await evaluateAnswer(currentQuestion.text, answer);
 
-        // 2. Save result (Spreading the AI response directly)
+        // 3. Save result with SAFETY values (prevents crashes if AI returns nothing)
         addResult({
           question: currentQuestion.text,
           answer,
-          ...evaluation, 
+          score: evaluation?.score || 5,
+          situation: evaluation?.situation || "Analysis completed",
+          task: evaluation?.task || "Context identified",
+          action: evaluation?.action || "Action noted",
+          result: evaluation?.result || "Result evaluated",
+          aiSummary: evaluation?.aiSummary || "Feedback successfully generated."
         });
-
-        // 3. Save raw answer
-        saveAnswer(currentIndex, answer);
-        
-        // 4. Reset UI
-        setAnswer("");
-
-        if (currentIndex === questions.length - 1) {
-          onFinish();
-        } else {
-          nextQuestion();
-          setTimeLeft(60);
-        }
       } catch (error) {
-        console.error("Frontend Error:", error);
-        // Fallback: move to next question anyway so user isn't stuck
-        nextQuestion(); 
-      } finally {
-        setIsLoading(false); // Stop loading
+        console.error("AI Error - Moving forward with fallback:", error);
+        // If AI fails, save a fallback so the app doesn't break
+        addResult({
+          question: currentQuestion.text,
+          answer,
+          score: 0,
+          aiSummary: "AI evaluation skipped due to connection error."
+        });
+      }
+
+      // 4. RESET & MOVE (These lines are now outside the 'try' to ensure they ALWAYS run)
+      saveAnswer(currentIndex, answer);
+      setAnswer("");
+      setIsLoading(false); 
+
+      if (currentIndex === questions.length - 1) {
+        onFinish();
+      } else {
+        nextQuestion();
+        setTimeLeft(60);
       }
     },
     [answer, currentIndex, nextQuestion, onFinish, saveAnswer, addResult, currentQuestion, isLoading]
