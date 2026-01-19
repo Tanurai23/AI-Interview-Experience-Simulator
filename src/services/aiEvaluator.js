@@ -12,15 +12,12 @@ export const evaluateAnswer = async (question, answer) => {
 
   return response.json();
 };
-export const evaluateAnswerLocally = (question, answer) => {
-  // For simplicity, using "general" topic for all questions
-  const { score, matchedKeywords, feedback } =
-    scoreAnswerWithRules(answer, "general");
-    const quality = getAnswerQuality(score);    
-    return {    
-        score,
-        matchedKeywords,
-        feedback: feedback.join(" "),
-        quality,
-    };  
-}
+export const formatFeedbackSTAR = (question, aiFeedback) => {
+  return {
+    situation: "Briefly describe the scenario in your answer",
+    task: "State the task or goal clearly",
+    action: "Explain steps you took or skills used",
+    result: "Show outcome or learning points",
+    aiSummary: aiFeedback,
+  };
+};
