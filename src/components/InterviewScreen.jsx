@@ -3,30 +3,17 @@ import useInterviewStore from "../store/interviewStore";
 import questions from "../data/questions";
 import { evaluateAnswer } from "../services/aiEvaluator";
 
-// 🛠️ Helper function to parse the STAR feedback
-const formatFeedbackSTAR = (question, feedbackText) => {
-  // If your AI returns a string, this helper ensures we have an object for the UI
-  return {
-    score: Math.floor(Math.random() * 3) + 7, // Placeholder score if AI doesn't provide one
-    situation: "Analyzed based on user response",
-    task: "Identified from context",
-    action: "Extracted from answer",
-    result: "Evaluated outcome",
-    aiSummary: feedbackText || "No summary provided",
-  };
-};
-
 const InterviewScreen = ({ onFinish }) => {
   const textareaRef = useRef(null);
   const [timeLeft, setTimeLeft] = useState(60);
   const [answer, setAnswer] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // New: Loading state
 
   const {
     currentIndex,
     saveAnswer,
     nextQuestion,
     addResult,
-    saveEvaluation,
   } = useInterviewStore();
 
   const currentQuestion = questions[currentIndex];
@@ -35,32 +22,27 @@ const InterviewScreen = ({ onFinish }) => {
   const handleNext = useCallback(
     async (isAutoSubmit = false) => {
       if (!isAutoSubmit && !answer.trim()) return;
+      if (isLoading) return; // Prevent double clicks
+
+      setIsLoading(true); // Start loading
 
       try {
-        // 1️⃣ AI Evaluation
-        const rawEvaluation = await evaluateAnswer(currentQuestion.text, answer);
+        // 1. Start the API call
+        const evaluation = await evaluateAnswer(currentQuestion.text, answer);
 
-        // 2️⃣ Use the helper function (Fixes the 'not defined' error)
-        const structuredEvaluation = formatFeedbackSTAR(
-          currentQuestion.text,
-          rawEvaluation.feedback
-        );
-
-        // 3️⃣ Save evaluation to Zustand
-        saveEvaluation(currentIndex, structuredEvaluation);
-
-        // 4️⃣ Save full result (Fixed the 'evaluation' is not defined error)
+        // 2. Save result (Spreading the AI response directly)
         addResult({
           question: currentQuestion.text,
           answer,
-          ...structuredEvaluation, // Spread the structured data
+          ...evaluation, 
         });
 
-        // 5️⃣ Save raw answer
+        // 3. Save raw answer
         saveAnswer(currentIndex, answer);
-
-        // 6️⃣ Reset & Move forward
+        
+        // 4. Reset UI
         setAnswer("");
+
         if (currentIndex === questions.length - 1) {
           onFinish();
         } else {
@@ -68,10 +50,14 @@ const InterviewScreen = ({ onFinish }) => {
           setTimeLeft(60);
         }
       } catch (error) {
-        console.error("Evaluation failed:", error);
+        console.error("Frontend Error:", error);
+        // Fallback: move to next question anyway so user isn't stuck
+        nextQuestion(); 
+      } finally {
+        setIsLoading(false); // Stop loading
       }
     },
-    [answer, currentIndex, nextQuestion, onFinish, saveAnswer, addResult, saveEvaluation, currentQuestion]
+    [answer, currentIndex, nextQuestion, onFinish, saveAnswer, addResult, currentQuestion, isLoading]
   );
 
   // ---------- TIMER ----------
@@ -119,19 +105,31 @@ const InterviewScreen = ({ onFinish }) => {
         rows="5"
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
-        className="w-full border-2 p-4 rounded-xl mb-4 focus:border-blue-500 outline-none transition"
+        disabled={isLoading}
+        className="w-full border-2 p-4 rounded-xl mb-4 focus:border-blue-500 outline-none transition disabled:bg-gray-50"
         placeholder="Type your answer here..."
       />
 
       <div className="flex justify-end">
         <button
           onClick={() => handleNext(false)}
-          disabled={!answer.trim()}
-          className={`px-5 py-2 rounded-lg font-medium transition ${
-            answer.trim() ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-gray-200 text-gray-400 cursor-not-allowed"
+          disabled={!answer.trim() || isLoading}
+          className={`px-5 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
+            answer.trim() && !isLoading
+              ? "bg-blue-600 text-white hover:bg-blue-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
           }`}
         >
-          {currentIndex === questions.length - 1 ? "Finish Interview" : "Next Question"}
+          {isLoading ? (
+            <>
+              <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+              Analyzing...
+            </>
+          ) : currentIndex === questions.length - 1 ? (
+            "Finish Interview"
+          ) : (
+            "Next Question"
+          )}
         </button>
       </div>
     </main>
