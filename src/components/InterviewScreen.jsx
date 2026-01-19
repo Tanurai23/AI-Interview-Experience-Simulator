@@ -1,8 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import useInterviewStore from "../store/interviewStore";
 import questions from "../data/questions";
-import { evaluateAnswer } from "../utils/evaluateAnswer";
-
+import { evaluateAnswer } from "../services/aiEvaluator";
 
 const InterviewScreen = ({ onFinish }) => {
   const textareaRef = useRef(null);
@@ -11,40 +10,43 @@ const InterviewScreen = ({ onFinish }) => {
   const [answer, setAnswer] = useState("");
 
   const {
-  currentIndex,
-  saveAnswer,
-  nextQuestion,
-  addResult,
-} = useInterviewStore();
-
+    currentIndex,
+    saveAnswer,
+    nextQuestion,
+    addResult,
+    saveEvaluation,
+  } = useInterviewStore();
 
   const currentQuestion = questions[currentIndex];
 
-  // ---------- HANDLE NEXT (manual / auto submit) ----------
+  // ---------- HANDLE NEXT ----------
   const handleNext = useCallback(
-  (isAutoSubmit = false) => {
+  async (isAutoSubmit = false) => {
     if (!isAutoSubmit && !answer.trim()) return;
 
-    // ✅ STEP 1: Evaluate answer
-    const evaluation = evaluateAnswer(
-      answer,
-      currentQuestion.topic
+    // 1️⃣ AI Evaluation
+    const evaluation = await evaluateAnswer(
+      currentQuestion.text,
+      answer
     );
 
-    // ✅ STEP 2: Save evaluated result
+    // 2️⃣ Save evaluation
+    saveEvaluation(currentIndex, evaluation);
+
+    // 3️⃣ Save full result
     addResult({
       question: currentQuestion.text,
       answer,
       ...evaluation,
     });
 
-    // ✅ STEP 3: Save raw answer (optional but good)
+    // 4️⃣ Save raw answer
     saveAnswer(currentIndex, answer);
 
-    // ✅ STEP 4: Reset answer
+    // 5️⃣ Reset
     setAnswer("");
 
-    // ✅ STEP 5: Move forward
+    // 6️⃣ Move forward
     if (currentIndex === questions.length - 1) {
       onFinish();
     } else {
@@ -59,6 +61,7 @@ const InterviewScreen = ({ onFinish }) => {
     onFinish,
     saveAnswer,
     addResult,
+    saveEvaluation,
     currentQuestion,
   ]
 );
@@ -78,12 +81,12 @@ const InterviewScreen = ({ onFinish }) => {
     return () => clearInterval(timer);
   }, [timeLeft, handleNext]);
 
-  // ---------- AUTO FOCUS TEXTAREA ----------
+  // ---------- AUTO FOCUS ----------
   useEffect(() => {
     textareaRef.current?.focus();
   }, [currentIndex]);
 
-  // ---------- KEYBOARD SHORTCUT (Ctrl + Enter) ----------
+  // ---------- KEYBOARD ----------
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === "Enter" && e.ctrlKey) {
@@ -92,7 +95,8 @@ const InterviewScreen = ({ onFinish }) => {
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () =>
+      window.removeEventListener("keydown", handleKeyDown);
   }, [handleNext]);
 
   if (!currentQuestion) {
@@ -104,23 +108,18 @@ const InterviewScreen = ({ onFinish }) => {
   }
 
   return (
-    <main
-      className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg"
-      aria-labelledby="question-heading"
-    >
+    <main className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg">
       {/* HEADER */}
       <header className="mb-8">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+          <span className="text-xs font-bold text-gray-400 uppercase">
             Question {currentIndex + 1} / {questions.length}
           </span>
 
           <span
-            aria-live="polite"
-            aria-label={`Time left ${timeLeft} seconds`}
-            className={`font-mono font-bold transition-all duration-300 ${
+            className={`font-mono font-bold ${
               timeLeft <= 10
-                ? "text-red-600 scale-110 animate-pulse"
+                ? "text-red-600 animate-pulse"
                 : "text-blue-600"
             }`}
           >
@@ -128,68 +127,48 @@ const InterviewScreen = ({ onFinish }) => {
           </span>
         </div>
 
-        {/* PROGRESS BAR */}
-        <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+        <div className="w-full bg-gray-100 h-2 rounded-full">
           <div
-            className="bg-blue-600 h-full transition-all duration-500 ease-out"
+            className="bg-blue-600 h-full transition-all"
             style={{
-              width: `${((currentIndex + 1) / questions.length) * 100}%`,
+              width: `${
+                ((currentIndex + 1) / questions.length) * 100
+              }%`,
             }}
           />
         </div>
       </header>
 
       {/* QUESTION */}
-      <h2
-        id="question-heading"
-        key={currentIndex}
-        className="text-xl font-medium text-gray-800 mb-6 leading-relaxed animate-fadeIn"
-      >
+      <h2 className="text-xl font-medium mb-6">
         {currentQuestion.text}
       </h2>
 
-      {/* ANSWER INPUT */}
+      {/* ANSWER */}
       <textarea
         ref={textareaRef}
-        className="
-          w-full border-2 border-gray-200
-          focus:border-blue-500
-          focus:ring-2 focus:ring-blue-200
-          p-4 rounded-xl mb-2
-          transition-all outline-none
-        "
         rows="5"
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
+        className="w-full border-2 p-4 rounded-xl mb-4"
         placeholder="Type your answer here..."
       />
-
-      <p className="text-xs text-gray-400 mb-4">
-        Press <strong>Ctrl + Enter</strong> to continue
-      </p>
 
       {/* ACTION */}
       <div className="flex justify-end">
         <button
-  onClick={() => handleNext(false)}
-  disabled={!answer.trim()}
-  className={`
-    px-5 py-2 rounded-lg font-medium
-    transition-all duration-150
-    focus:outline-none
-    focus:ring-2 focus:ring-blue-400 focus:ring-offset-2
-    ${
-      answer.trim()
-        ? "bg-blue-600 text-white hover:bg-blue-700 active:scale-95 shadow-md"
-        : "bg-gray-200 text-gray-400 cursor-not-allowed disabled:opacity-80 disabled:pointer-events-none"
-    }
-  `}
->
-  {currentIndex === questions.length - 1
-    ? "Finish Interview"
-    : "Next Question"}
-</button>
-
+          onClick={() => handleNext(false)}
+          disabled={!answer.trim()}
+          className={`px-5 py-2 rounded-lg font-medium transition ${
+            answer.trim()
+              ? "bg-blue-600 text-white hover:bg-blue-700"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+          }`}
+        >
+          {currentIndex === questions.length - 1
+            ? "Finish Interview"
+            : "Next Question"}
+        </button>
       </div>
     </main>
   );

@@ -22,6 +22,7 @@ const useInterviewStore = create((set) => ({
     set({
       currentIndex: 0,
       answers: {},
+      evaluations: {},
     }),
 
   // ---------------- ATTEMPTS / HISTORY ----------------
@@ -60,6 +61,17 @@ const useInterviewStore = create((set) => ({
           date: new Date().toLocaleDateString(),
         },
       ],
+    })),
+
+  // ---------------- AI EVALUATION ----------------
+  evaluations: {},
+
+  saveEvaluation: (index, evaluation) =>
+    set((state) => ({
+      evaluations: {
+        ...state.evaluations,
+        [index]: evaluation,
+      },
     })),
 }));
 

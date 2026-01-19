@@ -91,7 +91,15 @@ return (
         <footer className="text-center pb-6">
           <button
             onClick={() => setScreen("history")}
-            className="text-xs text-gray-500 hover:text-gray-700"
+            className="
+bg-gradient-to-r from-blue-500 to-indigo-600
+text-white px-6 py-3 rounded-xl
+shadow-lg shadow-blue-500/30
+hover:scale-105 hover:shadow-xl
+active:scale-95
+transition-all duration-300
+"
+
           >
             View History
           </button>

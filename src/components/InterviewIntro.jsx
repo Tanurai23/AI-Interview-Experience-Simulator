@@ -41,7 +41,15 @@ function InterviewIntro({ config, onStart }) {
         {/* ACTION */}
         <button
           onClick={onStart}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
+          className="
+bg-gradient-to-r from-blue-500 to-indigo-600
+text-white px-6 py-3 rounded-xl
+shadow-lg shadow-blue-500/30
+hover:scale-105 hover:shadow-xl
+active:scale-95
+transition-all duration-300
+"
+
         >
           Start Interview
         </button>
