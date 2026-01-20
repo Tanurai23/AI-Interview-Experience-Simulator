@@ -1,10 +1,11 @@
 import { create } from "zustand";
 
-const savedAttempts =
-  JSON.parse(localStorage.getItem("interviewAttempts")) || [];
+/* ---------------- LOAD SAVED SESSIONS ---------------- */
+const savedSessions =
+  JSON.parse(localStorage.getItem("interviewSessions")) || [];
 
-const useInterviewStore = create((set) => ({
-  // ---------------- CORE INTERVIEW STATE ----------------
+const useInterviewStore = create((set, get) => ({
+  /* ================= CORE INTERVIEW STATE ================= */
   currentIndex: 0,
   answers: {},
 
@@ -22,23 +23,10 @@ const useInterviewStore = create((set) => ({
     set({
       currentIndex: 0,
       answers: {},
-      evaluations: {},
+      results: [],
     }),
 
-  // ---------------- ATTEMPTS / HISTORY ----------------
-  attempts: savedAttempts,
-
-  saveAttempt: (score) =>
-    set((state) => {
-      const updated = [
-        ...state.attempts,
-        { score, date: new Date().toISOString() },
-      ];
-      localStorage.setItem("interviewAttempts", JSON.stringify(updated));
-      return { attempts: updated };
-    }),
-
-  // ---------------- RESULTS ----------------
+  /* ================= AI RESULTS (PER QUESTION) ================= */
   results: [],
 
   addResult: (result) =>
@@ -48,31 +36,39 @@ const useInterviewStore = create((set) => ({
 
   clearResults: () => set({ results: [] }),
 
-  // ---------------- SESSION ANALYTICS ----------------
-  sessionHistory: [],
+  /* ================= SESSION ANALYTICS (THIS FIXES UI) ================= */
+  sessions: savedSessions,
 
-  saveSession: (score) =>
-    set((state) => ({
-      sessionHistory: [
-        ...state.sessionHistory,
-        {
-          session: state.sessionHistory.length + 1,
-          score,
-          date: new Date().toLocaleDateString(),
-        },
-      ],
-    })),
+  finishInterview: () => {
+    const { results, sessions } = get();
 
-  // ---------------- AI EVALUATION ----------------
-  evaluations: {},
+    if (results.length === 0) return;
 
-  saveEvaluation: (index, evaluation) =>
-    set((state) => ({
-      evaluations: {
-        ...state.evaluations,
-        [index]: evaluation,
-      },
-    })),
+    const avgScore =
+      results.reduce((sum, r) => sum + (r.score || 0), 0) /
+      results.length;
+
+    const newSession = {
+      id: Date.now(),
+      date: new Date().toLocaleString(),
+      totalQuestions: results.length,
+      averageScore: Number(avgScore.toFixed(1)),
+    };
+
+    const updatedSessions = [...sessions, newSession];
+
+    localStorage.setItem(
+      "interviewSessions",
+      JSON.stringify(updatedSessions)
+    );
+
+    set({
+      sessions: updatedSessions,
+      currentIndex: 0,
+      answers: {},
+      results: [],
+    });
+  },
 }));
 
 export default useInterviewStore;
