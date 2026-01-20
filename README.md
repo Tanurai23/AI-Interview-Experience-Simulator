@@ -71,7 +71,7 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 =======
 # AI-Interview-Experience-Simulator
-A realistic AI Interview Simulator built with React/Next.js and TailwindCSS. Features timed mock interviews and efficient state management
+A full-stack frontend interview preparation platform that simulates real interview conditions using AI-based answer evaluation.
 
 ## 🚀 Live Demo
 https://ai-interview-simulator.vercel.app
@@ -83,12 +83,15 @@ https://ai-interview-simulator.vercel.app
 - AI evaluation service (API based)
 - LocalStorage (session persistence)
 
-## Features
-- AI-powered interview simulation
-- Timed questions with auto-submit
-- Per-question AI evaluation
-- Analytics dashboard (strengths & weaknesses)
-- Session-based score tracking
+## 🚀 Features
+- Timed interview questions
+- Auto-submit when timer expires
+- AI-based answer evaluation
+- STAR method feedback (Situation, Task, Action, Result)
+- Mock score and performance summary
+- Strengths & weaknesses analysis
+- Session history tracking
+- Clean, responsive UI
 
 ## 🤖 AI Evaluation Strategy
 The application uses a mock AI evaluation service to simulate LLM-based scoring and feedback.
