@@ -26,8 +26,9 @@ const useInterviewStore = create((set, get) => ({
       results: [],
     }),
 
-  /* ================= AI RESULTS (PER QUESTION) ================= */
+  /* ================= AI RESULTS ================= */
   results: [],
+  lastResults: [], // ✅ NEW (for Results screen)
 
   addResult: (result) =>
     set((state) => ({
@@ -36,13 +37,13 @@ const useInterviewStore = create((set, get) => ({
 
   clearResults: () => set({ results: [] }),
 
-  /* ================= SESSION ANALYTICS (THIS FIXES UI) ================= */
+  /* ================= SESSION HISTORY ================= */
   sessions: savedSessions,
 
   finishInterview: () => {
     const { results, sessions } = get();
 
-    if (results.length === 0) return;
+    if (!results || results.length === 0) return;
 
     const avgScore =
       results.reduce((sum, r) => sum + (r.score || 0), 0) /
@@ -64,9 +65,10 @@ const useInterviewStore = create((set, get) => ({
 
     set({
       sessions: updatedSessions,
+      lastResults: results, // ✅ SAVE BEFORE CLEARING
       currentIndex: 0,
       answers: {},
-      results: [],
+      results: [], // reset safely
     });
   },
 }));

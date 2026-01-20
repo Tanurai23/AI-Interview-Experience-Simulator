@@ -15,7 +15,7 @@ const InterviewScreen = ({ onFinish }) => {
     saveAnswer,
     nextQuestion,
     addResult,
-    finishInterview, // ✅ VERY IMPORTANT
+    finishInterview,
   } = useInterviewStore();
 
   const currentQuestion = questions[currentIndex];
@@ -23,41 +23,56 @@ const InterviewScreen = ({ onFinish }) => {
   // ---------------- HANDLE NEXT ----------------
   const handleNext = useCallback(
     async (autoSubmit = false) => {
-      if (!autoSubmit && !answer.trim()) return;
       if (isLoading) return;
+
+      const finalAnswer = answer.trim();
+
+      // ✅ Always save answer (even empty on auto-submit)
+      saveAnswer(currentIndex, finalAnswer);
 
       setIsLoading(true);
 
       try {
-        const evaluation = await evaluateAnswer(
-          currentQuestion.text,
-          answer
-        );
+        let evaluation = null;
 
+        if (finalAnswer) {
+          evaluation = await evaluateAnswer(
+            currentQuestion.text,
+            finalAnswer
+          );
+        }
+
+        // ✅ GUARANTEED result push
         addResult({
           question: currentQuestion.text,
-          answer,
-          score: evaluation?.score ?? 5,
-          aiSummary: evaluation?.aiSummary ?? "Evaluation complete",
+          answer: finalAnswer || "(No answer provided)",
+          score: evaluation?.score ?? 0,
+          aiSummary:
+            evaluation?.aiSummary ??
+            (finalAnswer
+              ? "Evaluation complete"
+              : "No answer submitted"),
         });
       } catch (error) {
         console.error("AI failed:", error);
         addResult({
           question: currentQuestion.text,
-          answer,
+          answer: finalAnswer || "(No answer provided)",
           score: 0,
           aiSummary: "AI evaluation failed",
         });
       }
 
-      saveAnswer(currentIndex, answer);
       setAnswer("");
       setIsLoading(false);
 
       // ✅ FINAL QUESTION
       if (currentIndex === questions.length - 1) {
-        finishInterview(); // 🔥 THIS FIXES ANALYTICS
-        onFinish();
+        // ⏱ ensure Zustand updates before navigation
+        setTimeout(() => {
+          finishInterview();
+          onFinish();
+        }, 0);
       } else {
         nextQuestion();
         setTimeLeft(60);
@@ -146,9 +161,9 @@ const InterviewScreen = ({ onFinish }) => {
       <div className="flex justify-end">
         <button
           onClick={() => handleNext(false)}
-          disabled={!answer.trim() || isLoading}
+          disabled={isLoading}
           className={`px-6 py-2 rounded-lg font-medium transition ${
-            answer.trim() && !isLoading
+            !isLoading
               ? "bg-blue-600 text-white hover:bg-blue-700"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
           }`}
