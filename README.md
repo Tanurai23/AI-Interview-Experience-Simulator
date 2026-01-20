@@ -77,24 +77,30 @@ A realistic AI Interview Simulator built with React/Next.js and TailwindCSS. Fea
 https://ai-interview-simulator.vercel.app
 
 ## 🛠 Tech Stack
-- React
-- Zustand
+- React / Next.js
 - Tailwind CSS
-- Chart.js
-- Vercel (Deployment)
+- Zustand (state management)
+- AI evaluation service (API based)
+- LocalStorage (session persistence)
 
-## ✨ Features
-- Timed interview simulation
-- Keyboard shortcuts
-- Analytics dashboard
-- Session history
-- Dark mode
+## Features
+- AI-powered interview simulation
+- Timed questions with auto-submit
+- Per-question AI evaluation
+- Analytics dashboard (strengths & weaknesses)
+- Session-based score tracking
 
 ## 🤖 AI Evaluation Strategy
 The application uses a mock AI evaluation service to simulate LLM-based scoring and feedback.
 The architecture is AI-ready and can integrate real models such as OpenAI or Claude via
 serverless APIs without frontend changes.
 
+## 📊 How It Works
+1. User starts interview
+2. Each question is timed
+3. Answers are evaluated by AI
+4. Results are analyzed after interview
+5. Performance summary is shown
 
 ## 📦 Installation
 ```bash
