@@ -1,14 +1,17 @@
 import useInterviewStore from "../store/interviewStore";
 
 const ResultScreen = ({ onAnalytics }) => {
-  const { results } = useInterviewStore();
+  const { results, finishInterview } = useInterviewStore();
 
   return (
     <div className="max-w-4xl mx-auto mt-10 p-4 space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Interview Feedback</h2>
         <button
-          onClick={onAnalytics}
+          onClick={() => {
+            finishInterview();
+            onAnalytics();
+          }}
           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors shadow-md"
         >
           View Overall Analytics

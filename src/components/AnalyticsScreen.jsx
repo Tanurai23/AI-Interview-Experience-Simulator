@@ -1,9 +1,10 @@
 import useInterviewStore from "../store/interviewStore";
 
 function AnalyticsScreen() {
-  const { attempts } = useInterviewStore();
+  const { sessions } = useInterviewStore();
 
-  if (attempts.length === 0) {
+
+  if (sessions.length === 0) {
     return (
       <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded shadow">
         <p className="text-sm text-gray-400 italic">
@@ -14,7 +15,7 @@ function AnalyticsScreen() {
     );
   }
 
-  const scores = attempts.map((a) => a.score);
+  const scores = sessions.map((s) => s.averageScore);
   const averageScore =
     scores.reduce((sum, s) => sum + s, 0) / scores.length;
 
