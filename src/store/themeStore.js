@@ -1,12 +1,20 @@
 import { create } from "zustand";
 
 const useThemeStore = create((set) => ({
-  dark: false,
+  isDark: false,
   toggleTheme: () =>
     set((state) => {
-      const newTheme = !state.dark;
-      document.documentElement.classList.toggle("dark", newTheme);
-      return { dark: newTheme };
+      const newTheme = !state.isDark;
+
+      if (newTheme) {
+        document.documentElement.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        localStorage.setItem("theme", "light");
+      }
+
+      return { isDark: newTheme };
     }),
 }));
 
