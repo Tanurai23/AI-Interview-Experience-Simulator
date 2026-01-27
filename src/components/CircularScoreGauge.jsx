@@ -1,48 +1,39 @@
-const CircularScoreGauge = ({ score = 0, size = 140 }) => {
-  const strokeWidth = 10;
-  const radius = (size - strokeWidth) / 2;
+const CircularScoreGauge = ({ score }) => {
+  const radius = 60;
   const circumference = 2 * Math.PI * radius;
-  const progress = (score / 100) * circumference;
+  const offset = circumference - (score / 100) * circumference;
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <svg
-        width={size}
-        height={size}
-        className="rotate-[-90deg]"
-      >
-        {/* Background circle */}
+    <div className="flex flex-col items-center justify-center">
+      <svg width="160" height="160" className="-rotate-90">
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          cx="80"
+          cy="80"
           r={radius}
-          stroke="#334155" // slate-700
-          strokeWidth={strokeWidth}
+          stroke="#1e293b"
+          strokeWidth="10"
           fill="none"
         />
-
-        {/* Progress circle */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          cx="80"
+          cy="80"
           r={radius}
-          stroke="#3b82f6" // blue-500
-          strokeWidth={strokeWidth}
+          stroke="#3b82f6"
+          strokeWidth="10"
           fill="none"
           strokeDasharray={circumference}
-          strokeDashoffset={circumference - progress}
+          strokeDashoffset={offset}
           strokeLinecap="round"
-          className="transition-all duration-700 ease-out"
         />
       </svg>
 
-      {/* Center Text */}
-      <div className="absolute flex flex-col items-center">
-        <span className="text-3xl font-bold text-white">
+      {/* CENTER TEXT */}
+      <div className="absolute flex flex-col items-center justify-center">
+        <span className="text-4xl font-bold text-white">
           {score}%
         </span>
-        <span className="text-xs text-slate-400 tracking-wide">
-          SCORE
+        <span className="text-sm text-slate-400">
+          Overall Score
         </span>
       </div>
     </div>

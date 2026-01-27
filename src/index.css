@@ -8,13 +8,7 @@
 /* Base theme */
 html,
 body {
-  background-color: #0f172a; /* Slate-900 */
-}
-
-/* Global body styles */
-body {
-  @apply text-slate-100 antialiased;
-  font-family: "Inter", system-ui, sans-serif;
+  @apply bg-[#0f172a] text-slate-200;
 }
 
 /* Subtle fade-in animation (used for page transitions / questions) */

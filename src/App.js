@@ -16,16 +16,22 @@ import useThemeStore from "./store/themeStore";
 
 function App() {
   const [screen, setScreen] = useState("landing");
-  useThemeStore(); // ensures store initializes
 
+  // ✅ Properly consume theme state
+  const { isDark } = useThemeStore();
 
-  // ✅ Persist dark mode on refresh
+  // ✅ Sync theme with <html> and localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.documentElement.classList.add("dark");
+    const root = document.documentElement;
+
+    if (isDark) {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      root.classList.remove("dark");
+      localStorage.setItem("theme", "light");
     }
-  }, []);
+  }, [isDark]);
 
   const renderContent = () => {
     switch (screen) {
@@ -68,20 +74,12 @@ function App() {
         return <AnalyticsScreen onBack={() => setScreen("landing")} />;
 
       default:
-        return <div>Screen not found</div>;
+        return <div className="text-center">Screen not found</div>;
     }
   };
 
   return (
-    <div
-      className="
-        min-h-screen flex flex-col
-        bg-gradient-to-br
-        from-gray-50 to-gray-100
-        dark:from-zinc-900 dark:to-black
-        transition-colors duration-300
-      "
-    >
+    <div className={`${isDark ? "dark" : ""} min-h-screen bg-[#0f172a]`}>
       {/* HEADER */}
       <Header
         currentScreen={screen}
@@ -89,21 +87,21 @@ function App() {
       />
 
       {/* MAIN CONTENT */}
-      <main className="flex justify-center px-4 py-12 flex-1">
+       <main className="flex justify-center px-4 py-12">
         <AnimatePresence mode="wait">
           <motion.div
             key={screen}
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -24 }}
-            transition={{ duration: 0.45, ease: "easeInOut" }}
+            transition={{ duration: 0.4, ease: "easeInOut" }}
             className="
               w-full max-w-5xl
-              bg-white/70 dark:bg-zinc-900/70
+              bg-white/80 dark:bg-slate-800/50
               backdrop-blur-xl
-              border border-white/20 dark:border-white/10
+              border border-slate-200 dark:border-slate-700
               rounded-3xl
-              shadow-2xl
+              shadow-xl
               p-6 md:p-10
             "
           >
@@ -118,11 +116,10 @@ function App() {
           <button
             onClick={() => setScreen("history")}
             className="
-              bg-gradient-to-r from-blue-500 to-indigo-600
+              bg-blue-600 hover:bg-blue-500
               text-white px-6 py-3 rounded-xl
               shadow-lg shadow-blue-500/30
-              hover:scale-105 hover:shadow-xl
-              active:scale-95
+              hover:scale-105 active:scale-95
               transition-all duration-300
             "
           >

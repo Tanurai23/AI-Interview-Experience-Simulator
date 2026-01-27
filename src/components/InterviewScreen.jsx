@@ -115,68 +115,90 @@ const InterviewScreen = ({ onFinish }) => {
   }
 
   return (
-    <main className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-2xl shadow-lg">
-      {/* HEADER */}
-      <header className="mb-6">
-        <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-400">
-            Question {currentIndex + 1} / {questions.length}
-          </span>
-          <span
-            className={`font-bold ${
-              timeLeft <= 10 ? "text-red-600 animate-pulse" : "text-blue-600"
-            }`}
-          >
-            ⏱ {timeLeft}s
-          </span>
-        </div>
+  <main
+    className="
+      max-w-3xl mx-auto mt-12 p-8
+      bg-slate-800/50 backdrop-blur-md
+      border border-slate-700
+      rounded-3xl shadow-2xl
+    "
+  >
+    {/* HEADER */}
+    <header className="mb-8">
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-xs font-semibold text-slate-400 tracking-wide uppercase">
+          Question {currentIndex + 1} / {questions.length}
+        </span>
 
-        <div className="w-full bg-gray-200 h-2 rounded-full mt-2">
-          <div
-            className="bg-blue-600 h-full rounded-full transition-all"
-            style={{
-              width: `${((currentIndex + 1) / questions.length) * 100}%`,
-            }}
-          />
-        </div>
-      </header>
-
-      {/* QUESTION */}
-      <h2 className="text-xl font-medium mb-5">
-        {currentQuestion.text}
-      </h2>
-
-      {/* ANSWER */}
-      <textarea
-        ref={textareaRef}
-        rows={5}
-        value={answer}
-        onChange={(e) => setAnswer(e.target.value)}
-        disabled={isLoading}
-        className="w-full border-2 p-4 rounded-xl mb-4 focus:border-blue-500 outline-none"
-        placeholder="Type your answer here..."
-      />
-
-      {/* ACTION */}
-      <div className="flex justify-end">
-        <button
-          onClick={() => handleNext(false)}
-          disabled={isLoading}
-          className={`px-6 py-2 rounded-lg font-medium transition ${
-            !isLoading
-              ? "bg-blue-600 text-white hover:bg-blue-700"
-              : "bg-gray-200 text-gray-400 cursor-not-allowed"
+        <span
+          className={`font-mono font-bold transition ${
+            timeLeft <= 10
+              ? "text-red-500 animate-pulse"
+              : "text-blue-500"
           }`}
         >
-          {isLoading
-            ? "Analyzing..."
-            : currentIndex === questions.length - 1
-            ? "Finish Interview"
-            : "Next Question"}
-        </button>
+          ⏱ {timeLeft}s
+        </span>
       </div>
-    </main>
-  );
-};
 
+      {/* PROGRESS BAR */}
+      <div className="w-full bg-slate-700/40 h-2 rounded-full overflow-hidden">
+        <div
+          className="bg-blue-600 h-full transition-all duration-500"
+          style={{
+            width: `${((currentIndex + 1) / questions.length) * 100}%`,
+          }}
+        />
+      </div>
+    </header>
+
+    {/* QUESTION */}
+    <h2 className="text-xl font-medium text-slate-100 mb-6 leading-relaxed">
+      {currentQuestion.text}
+    </h2>
+
+    {/* ANSWER INPUT */}
+    <textarea
+      ref={textareaRef}
+      rows={5}
+      value={answer}
+      onChange={(e) => setAnswer(e.target.value)}
+      disabled={isLoading}
+      placeholder="Type your answer here..."
+      className="
+        w-full resize-none
+        bg-slate-900/60
+        border border-slate-700
+        rounded-xl p-4 mb-4
+        text-slate-100 placeholder:text-slate-500
+        focus:outline-none focus:ring-2 focus:ring-blue-500
+        transition
+      "
+    />
+
+    {/* ACTION */}
+    <div className="flex justify-end">
+      <button
+        onClick={() => handleNext(false)}
+        disabled={isLoading}
+        className={`
+          px-6 py-2 rounded-lg font-medium
+          transition-all duration-200
+          ${
+            isLoading
+              ? "bg-slate-700 text-slate-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30"
+          }
+        `}
+      >
+        {isLoading
+          ? "Analyzing..."
+          : currentIndex === questions.length - 1
+          ? "Finish Interview"
+          : "Next Question"}
+      </button>
+    </div>
+  </main>
+);
+}
 export default InterviewScreen;

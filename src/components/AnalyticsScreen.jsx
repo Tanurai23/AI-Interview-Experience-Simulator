@@ -1,73 +1,94 @@
 import useInterviewStore from "../store/interviewStore";
+import ProgressChart from "./ProgressChart";
 
-function AnalyticsScreen() {
-  const { sessions } = useInterviewStore();
+const AnalyticsScreen = ({ onBack }) => {
+  const { history } = useInterviewStore();
 
-
-  if (sessions.length === 0) {
+  if (!history || history.length === 0) {
     return (
-      <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded shadow">
-        <p className="text-sm text-gray-400 italic">
-  Analytics will appear after you complete your first interview.
-</p>
-
+      <div className="
+        max-w-xl mx-auto mt-10 p-6
+        bg-slate-800/50 backdrop-blur-md
+        border border-slate-700 rounded-xl
+        text-center text-slate-400
+      ">
+        Analytics will appear after you complete your first interview.
       </div>
     );
   }
 
-  const scores = sessions.map((s) => s.averageScore);
-  const averageScore =
-    scores.reduce((sum, s) => sum + s, 0) / scores.length;
+  const scores = history.map((s, index) => ({
+    session: `Session ${history.length - index}`,
+    score: s.score,
+  }));
 
-  const bestScore = Math.max(...scores);
+  const averageScore =
+    history.reduce((sum, s) => sum + s.score, 0) / history.length;
+
+  const bestScore = Math.max(...history.map((s) => s.score));
   const improvement =
-    scores.length > 1 ? scores[scores.length - 1] - scores[0] : 0;
+    history.length > 1
+      ? history[0].score - history[history.length - 1].score
+      : 0;
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-6 bg-white rounded-xl shadow">
-      <h2 className="text-2xl font-bold mb-6">Performance Analytics</h2>
+    <div className="max-w-5xl mx-auto mt-10 p-6 space-y-10">
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="p-4 border rounded text-center">
-          <p className="text-gray-500 text-sm">Average Score</p>
-          <p className="text-xl font-bold">{averageScore.toFixed(1)}</p>
-        </div>
+      {/* HEADER */}
+      <div className="flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-white">
+          Performance Analytics
+        </h2>
 
-        <div className="p-4 border rounded text-center">
-          <p className="text-gray-500 text-sm">Best Score</p>
-          <p className="text-xl font-bold">{bestScore}</p>
-        </div>
-
-        <div className="p-4 border rounded text-center">
-          <p className="text-gray-500 text-sm">Improvement</p>
-          <p
-            className={`text-xl font-bold ${
-              improvement >= 0 ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {improvement >= 0 ? "+" : ""}
-            {improvement}
-          </p>
-        </div>
+        <button
+          onClick={onBack}
+          className="
+            px-4 py-2 rounded-lg
+            border border-slate-600
+            text-slate-300 hover:bg-slate-700
+            transition
+          "
+        >
+          Back
+        </button>
       </div>
 
-      <h3 className="font-semibold mb-2">Score Trend</h3>
-      <div className="flex gap-2">
-        {scores.map((score, index) => (
-          <div
-            key={index}
-            className="bg-blue-500 text-white text-sm flex items-end justify-center rounded"
-            style={{
-              height: `${score * 10}px`,
-              width: "40px",
-            }}
-          >
-            {score}
-          </div>
-        ))}
+      {/* SUMMARY CARDS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <AnalyticsCard label="Average Score" value={`${averageScore.toFixed(1)}%`} />
+        <AnalyticsCard label="Best Score" value={`${bestScore}%`} />
+        <AnalyticsCard
+          label="Improvement"
+          value={`${improvement >= 0 ? "+" : ""}${improvement}%`}
+          highlight={improvement >= 0}
+        />
       </div>
+
+      {/* CHART */}
+      <ProgressChart data={scores} />
     </div>
   );
-}
+};
+
+const AnalyticsCard = ({ label, value, highlight }) => (
+  <div className="
+    bg-slate-800/50 backdrop-blur-md
+    border border-slate-700 rounded-xl
+    p-6 text-center shadow-lg
+  ">
+    <p className="text-sm text-slate-400 mb-1">{label}</p>
+    <p
+      className={`text-2xl font-bold ${
+        highlight === undefined
+          ? "text-white"
+          : highlight
+          ? "text-green-400"
+          : "text-red-400"
+      }`}
+    >
+      {value}
+    </p>
+  </div>
+);
 
 export default AnalyticsScreen;

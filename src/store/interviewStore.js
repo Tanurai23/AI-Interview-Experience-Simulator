@@ -4,8 +4,10 @@ import { create } from "zustand";
 const savedSessions =
   JSON.parse(localStorage.getItem("interviewSessions")) || [];
 
+const MAX_SCORE_PER_QUESTION = 10;
+
 const useInterviewStore = create((set, get) => ({
-  /* ================= CORE INTERVIEW STATE ================= */
+  /* ================= INTERVIEW FLOW ================= */
   currentIndex: 0,
   answers: {},
 
@@ -24,18 +26,17 @@ const useInterviewStore = create((set, get) => ({
       currentIndex: 0,
       answers: {},
       results: [],
+      lastResults: [],
     }),
 
   /* ================= AI RESULTS ================= */
-  results: [],
-  lastResults: [], // ✅ NEW (for Results screen)
+  results: [],        // temp results during interview
+  lastResults: [],    // finalized results for ResultScreen
 
   addResult: (result) =>
     set((state) => ({
       results: [...state.results, result],
     })),
-
-  clearResults: () => set({ results: [] }),
 
   /* ================= SESSION HISTORY ================= */
   sessions: savedSessions,
@@ -43,21 +44,32 @@ const useInterviewStore = create((set, get) => ({
   finishInterview: () => {
     const { results, sessions } = get();
 
-    if (!results || results.length === 0) return;
+    if (!results || results.length === 0) {
+      console.warn("finishInterview called with no results");
+      return;
+    }
 
-    const avgScore =
-      results.reduce((sum, r) => sum + (r.score || 0), 0) /
-      results.length;
+    // 🔢 Calculate average score (0–100)
+    const totalScore = results.reduce(
+      (sum, r) => sum + (r.score || 0),
+      0
+    );
+
+    const averageScore = Math.round(
+      (totalScore / (results.length * MAX_SCORE_PER_QUESTION)) * 100
+    );
 
     const newSession = {
       id: Date.now(),
       date: new Date().toLocaleString(),
       totalQuestions: results.length,
-      averageScore: Number(avgScore.toFixed(1)),
+      averageScore,
+      results,
     };
 
-    const updatedSessions = [...sessions, newSession];
+    const updatedSessions = [newSession, ...sessions];
 
+    // ✅ Persist sessions
     localStorage.setItem(
       "interviewSessions",
       JSON.stringify(updatedSessions)
@@ -65,11 +77,16 @@ const useInterviewStore = create((set, get) => ({
 
     set({
       sessions: updatedSessions,
-      lastResults: results, // ✅ SAVE BEFORE CLEARING
+      lastResults: results,
       currentIndex: 0,
       answers: {},
-      results: [], // reset safely
+      results: [],
     });
+  },
+
+  clearSessions: () => {
+    localStorage.removeItem("interviewSessions");
+    set({ sessions: [] });
   },
 }));
 
