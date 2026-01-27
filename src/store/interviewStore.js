@@ -30,8 +30,8 @@ const useInterviewStore = create((set, get) => ({
     }),
 
   /* ================= AI RESULTS ================= */
-  results: [],        // temp results during interview
-  lastResults: [],    // finalized results for ResultScreen
+  results: [],
+  lastResults: [],
 
   addResult: (result) =>
     set((state) => ({
@@ -44,12 +44,8 @@ const useInterviewStore = create((set, get) => ({
   finishInterview: () => {
     const { results, sessions } = get();
 
-    if (!results || results.length === 0) {
-      console.warn("finishInterview called with no results");
-      return;
-    }
+    if (!results.length) return;
 
-    // 🔢 Calculate average score (0–100)
     const totalScore = results.reduce(
       (sum, r) => sum + (r.score || 0),
       0
@@ -69,7 +65,6 @@ const useInterviewStore = create((set, get) => ({
 
     const updatedSessions = [newSession, ...sessions];
 
-    // ✅ Persist sessions
     localStorage.setItem(
       "interviewSessions",
       JSON.stringify(updatedSessions)
@@ -78,9 +73,9 @@ const useInterviewStore = create((set, get) => ({
     set({
       sessions: updatedSessions,
       lastResults: results,
+      results: [],
       currentIndex: 0,
       answers: {},
-      results: [],
     });
   },
 

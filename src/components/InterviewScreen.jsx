@@ -114,91 +114,92 @@ const InterviewScreen = ({ onFinish }) => {
     return <p className="text-center mt-10">Loading...</p>;
   }
 
-  return (
-  <main
-    className="
-      max-w-3xl mx-auto mt-12 p-8
-      bg-slate-800/50 backdrop-blur-md
-      border border-slate-700
-      rounded-3xl shadow-2xl
-    "
-  >
-    {/* HEADER */}
-    <header className="mb-8">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-xs font-semibold text-slate-400 tracking-wide uppercase">
-          Question {currentIndex + 1} / {questions.length}
-        </span>
-
-        <span
-          className={`font-mono font-bold transition ${
-            timeLeft <= 10
-              ? "text-red-500 animate-pulse"
-              : "text-blue-500"
-          }`}
-        >
-          ⏱ {timeLeft}s
-        </span>
-      </div>
-
-      {/* PROGRESS BAR */}
-      <div className="w-full bg-slate-700/40 h-2 rounded-full overflow-hidden">
-        <div
-          className="bg-blue-600 h-full transition-all duration-500"
-          style={{
-            width: `${((currentIndex + 1) / questions.length) * 100}%`,
-          }}
-        />
-      </div>
-    </header>
-
-    {/* QUESTION */}
-    <h2 className="text-xl font-medium text-slate-100 mb-6 leading-relaxed">
-      {currentQuestion.text}
-    </h2>
-
-    {/* ANSWER INPUT */}
-    <textarea
-      ref={textareaRef}
-      rows={5}
-      value={answer}
-      onChange={(e) => setAnswer(e.target.value)}
-      disabled={isLoading}
-      placeholder="Type your answer here..."
+ return (
+    <main
       className="
-        w-full resize-none
-        bg-slate-900/60
+        max-w-3xl mx-auto mt-6 md:mt-10 p-5 md:p-6
+        bg-slate-800/50 backdrop-blur-md
         border border-slate-700
-        rounded-xl p-4 mb-4
-        text-slate-100 placeholder:text-slate-500
-        focus:outline-none focus:ring-2 focus:ring-blue-500
-        transition
+        rounded-2xl shadow-2xl
       "
-    />
+    >
+      {/* HEADER: Tightened margins */}
+      <header className="mb-5">
+        <div className="flex justify-between items-center mb-3">
+          <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">
+            Question {currentIndex + 1} of {questions.length}
+          </span>
 
-    {/* ACTION */}
-    <div className="flex justify-end">
-      <button
-        onClick={() => handleNext(false)}
+          <span
+            className={`font-mono text-sm font-bold transition ${
+              timeLeft <= 10
+                ? "text-red-500 animate-pulse"
+                : "text-blue-500"
+            }`}
+          >
+            ⏱ {timeLeft}s
+          </span>
+        </div>
+
+        {/* PROGRESS BAR: Slimmer height */}
+        <div className="w-full bg-slate-700/40 h-1.5 rounded-full overflow-hidden">
+          <div
+            className="bg-blue-600 h-full transition-all duration-500"
+            style={{
+              width: `${((currentIndex + 1) / questions.length) * 100}%`,
+            }}
+          />
+        </div>
+      </header>
+
+      {/* QUESTION: Slightly smaller text for better fit */}
+      <h2 className="text-lg md:text-xl font-medium text-slate-100 mb-5 leading-snug">
+        {currentQuestion.text}
+      </h2>
+
+      {/* ANSWER INPUT: Reduced rows from 5 to 4 */}
+      <textarea
+        ref={textareaRef}
+        rows={4}
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
         disabled={isLoading}
-        className={`
-          px-6 py-2 rounded-lg font-medium
-          transition-all duration-200
-          ${
-            isLoading
-              ? "bg-slate-700 text-slate-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/30"
-          }
-        `}
-      >
-        {isLoading
-          ? "Analyzing..."
-          : currentIndex === questions.length - 1
-          ? "Finish Interview"
-          : "Next Question"}
-      </button>
-    </div>
-  </main>
-);
+        placeholder="Type your answer here..."
+        className="
+          w-full resize-none
+          bg-slate-900/60
+          border border-slate-700
+          rounded-xl p-4 mb-4
+          text-slate-100 text-sm md:text-base placeholder:text-slate-500
+          focus:outline-none focus:ring-2 focus:ring-blue-500
+          transition
+        "
+      />
+
+      {/* ACTION */}
+      <div className="flex justify-end">
+        <button
+          onClick={() => handleNext(false)}
+          disabled={isLoading}
+          className={`
+            px-8 py-2.5 rounded-xl font-bold text-sm
+            transition-all duration-200
+            active:scale-95
+            ${
+              isLoading
+                ? "bg-slate-700 text-slate-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20"
+            }
+          `}
+        >
+          {isLoading
+            ? "Analyzing..."
+            : currentIndex === questions.length - 1
+            ? "Finish Interview"
+            : "Next Question"}
+        </button>
+      </div>
+    </main>
+  );
 }
-export default InterviewScreen;
+export default InterviewScreen

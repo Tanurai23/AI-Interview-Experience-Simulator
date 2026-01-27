@@ -5,17 +5,54 @@
 /* Google Font */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
 
-/* Base theme */
-html,
-body {
-  @apply bg-[#0f172a] text-slate-200;
+/* Global Reset & Scroll Behavior */
+html {
+  scroll-behavior: smooth;
+  height: 100%;
 }
 
-/* Subtle fade-in animation (used for page transitions / questions) */
+body {
+  /* Ensuring a deep dark slate background that stays fixed */
+  @apply bg-slate-950 text-white antialiased;
+  
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  
+  /* background-attachment: fixed prevents the background color/image from scrolling */
+  background-attachment: fixed;
+  background-size: cover;
+  
+  /* Control Overflow: Stop horizontal leaks, allow vertical unless in 'App Mode' */
+  overflow-x: hidden;
+}
+
+/* CUSTOM NEON SCROLLBAR */
+/* Matches your Brain AI blue accents */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #020617; /* Matches slate-950 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b; /* slate-800 */
+  border-radius: 10px;
+  border: 2px solid #020617;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6; /* Blue-500: Matches your AI glow */
+  box-shadow: 0 0 10px #3b82f6;
+}
+
+/* ANIMATIONS */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -24,5 +61,10 @@ body {
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.35s ease-out;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Glassmorphism Utility (Optional for your Cards) */
+.glass-card {
+  @apply bg-slate-900/40 backdrop-blur-md border border-slate-700/50;
 }

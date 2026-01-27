@@ -1,19 +1,17 @@
 import useInterviewStore from "../store/interviewStore";
 import CircularScoreGauge from "./CircularScoreGauge";
+import { useEffect } from "react";
 
 const MAX_SCORE_PER_QUESTION = 10;
 
-const getPerformanceLabel = (score) => {
-  if (score >= 80) return "Excellent Performance";
-  if (score >= 60) return "Good Performance";
-  if (score >= 40) return "Needs Improvement";
-  return "Low Performance";
-};
-
 const ResultScreen = ({ onAnalytics }) => {
-  const { lastResults } = useInterviewStore();
+  const { lastResults, finishInterview } = useInterviewStore();
 
-  if (!lastResults || lastResults.length === 0) {
+  useEffect(() => {
+    finishInterview(); // 🔥 FINALIZE SESSION
+  }, [finishInterview]);
+
+  if (!lastResults.length) {
     return (
       <p className="text-center mt-10 text-slate-400">
         No results found. Please complete an interview.
@@ -21,7 +19,6 @@ const ResultScreen = ({ onAnalytics }) => {
     );
   }
 
-  // 🔢 Calculate overall percentage score
   const totalScore = Math.round(
     (lastResults.reduce((sum, r) => sum + r.score, 0) /
       (lastResults.length * MAX_SCORE_PER_QUESTION)) *
@@ -29,9 +26,7 @@ const ResultScreen = ({ onAnalytics }) => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto mt-10 p-4 space-y-12">
-
-      {/* HEADER */}
+    <div className="max-w-4xl mx-auto mt-10 space-y-10">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-white">
           Interview Feedback
@@ -39,71 +34,14 @@ const ResultScreen = ({ onAnalytics }) => {
 
         <button
           onClick={onAnalytics}
-          className="
-            bg-blue-600 hover:bg-blue-500
-            text-white px-6 py-2 rounded-lg
-            transition-all shadow-md
-          "
+          className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg"
         >
           View Overall Analytics
         </button>
       </div>
 
-      {/* 🔵 OVERALL SCORE */}
-      <div className="flex justify-center text-center">
-        <div
-          className="
-            bg-slate-800/50 backdrop-blur-md
-            border border-slate-700
-            rounded-3xl p-8
-            shadow-xl space-y-3
-          "
-        >
-          <CircularScoreGauge score={totalScore} />
-
-          <p className="text-lg font-semibold text-white">
-            {getPerformanceLabel(totalScore)}
-          </p>
-
-          <p className="text-sm text-slate-400">
-            Based on clarity, relevance, and completeness
-          </p>
-        </div>
-      </div>
-
-      {/* 🧠 QUESTION BREAKDOWN */}
-      <div className="space-y-6">
-        {lastResults.map((res, idx) => (
-          <div
-            key={idx}
-            className="
-              p-6
-              bg-slate-800/50 backdrop-blur-md
-              border border-slate-700
-              rounded-2xl
-              shadow-lg
-              hover:border-blue-500/40
-              transition-all
-            "
-          >
-            <p className="text-blue-500 uppercase tracking-wider text-xs font-semibold">
-              Question {idx + 1}
-            </p>
-
-            <p className="font-semibold text-lg text-white mt-1">
-              {res.question}
-            </p>
-
-            <p className="text-sm font-medium text-slate-400 mt-1">
-              Score: {res.score}/{MAX_SCORE_PER_QUESTION}
-            </p>
-
-            <div className="mt-4 text-sm text-slate-300 leading-relaxed">
-              <strong className="text-white">AI Summary:</strong>{" "}
-              {res.aiSummary}
-            </div>
-          </div>
-        ))}
+      <div className="flex justify-center">
+        <CircularScoreGauge score={totalScore} />
       </div>
     </div>
   );
