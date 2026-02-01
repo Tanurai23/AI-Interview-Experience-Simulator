@@ -5,50 +5,106 @@
 /* Google Font */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
 
-/* Global Reset & Scroll Behavior */
+/* ============================================
+   GLOBAL RESET & NO-SCROLL FIX
+   ============================================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 html {
-  scroll-behavior: smooth;
   height: 100%;
+  /* Remove smooth scroll to prevent layout issues */
+  scroll-behavior: auto;
 }
 
 body {
-  /* Ensuring a deep dark slate background that stays fixed */
-  @apply bg-slate-950 text-white antialiased;
+  @apply bg-white text-gray-900 antialiased dark:bg-[#0f172a] dark:text-white;
+  transition: background-color 0.5s, color 0.5s;
   
   margin: 0;
   padding: 0;
-  min-height: 100vh;
-  
-  /* background-attachment: fixed prevents the background color/image from scrolling */
-  background-attachment: fixed;
-  background-size: cover;
-  
-  /* Control Overflow: Stop horizontal leaks, allow vertical unless in 'App Mode' */
+  height: 100%;
+  /* Remove overflow-x hidden as it can cause issues */
   overflow-x: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* CUSTOM NEON SCROLLBAR */
-/* Matches your Brain AI blue accents */
-::-webkit-scrollbar {
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ============================================
+   CUSTOM SCROLLBAR (Only for scrollable areas)
+   ============================================ */
+.overflow-y-auto::-webkit-scrollbar,
+main::-webkit-scrollbar {
   width: 8px;
 }
 
-::-webkit-scrollbar-track {
-  background: #020617; /* Matches slate-950 */
+.overflow-y-auto::-webkit-scrollbar-track,
+main::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #1e293b; /* slate-800 */
+.overflow-y-auto::-webkit-scrollbar-thumb,
+main::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
   border-radius: 10px;
-  border: 2px solid #020617;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #3b82f6; /* Blue-500: Matches your AI glow */
+.overflow-y-auto::-webkit-scrollbar-thumb:hover,
+main::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
   box-shadow: 0 0 10px #3b82f6;
 }
 
-/* ANIMATIONS */
+/* Dark mode scrollbar */
+.dark .overflow-y-auto::-webkit-scrollbar-thumb,
+.dark main::-webkit-scrollbar-thumb {
+  background: #1e293b;
+}
+
+.dark .overflow-y-auto::-webkit-scrollbar-thumb:hover,
+.dark main::-webkit-scrollbar-thumb:hover {
+  background: #3b82f6;
+  box-shadow: 0 0 10px #3b82f6;
+}
+
+/* Firefox scrollbar */
+.overflow-y-auto,
+main {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e0 transparent;
+}
+
+.dark .overflow-y-auto,
+.dark main {
+  scrollbar-color: #1e293b transparent;
+}
+
+/* ============================================
+   SMOOTH THEME TRANSITIONS (No flicker)
+   ============================================ */
+*,
+*::before,
+*::after {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 500ms;
+}
+
+/* Disable transitions on mount to prevent flicker */
+.preload * {
+  transition: none !important;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -64,7 +120,125 @@ body {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* Glassmorphism Utility (Optional for your Cards) */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient 3s ease infinite;
+}
+
+/* ============================================
+   GLASSMORPHISM UTILITY
+   ============================================ */
 .glass-card {
-  @apply bg-slate-900/40 backdrop-blur-md border border-slate-700/50;
+  @apply bg-white/80 dark:bg-slate-800/50 backdrop-blur-md border border-gray-300 dark:border-slate-700;
+  transition: all 0.5s ease;
+}
+
+/* ============================================
+   FOCUS STYLES
+   ============================================ */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* ============================================
+   RESPONSIVE TYPOGRAPHY
+   ============================================ */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 1025px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Prevent text selection on interactive elements */
+button,
+[role="button"] {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Ensure proper text size on mobile */
+@media (max-width: 640px) {
+  body {
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* Safe area for mobile notches */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* ============================================
+   CUSTOM COMPONENT STYLES
+   ============================================ */
+
+/* Custom button styles */
+.btn-primary {
+  @apply px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-95 transition-all duration-300;
+}
+
+.btn-secondary {
+  @apply px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white font-semibold rounded-xl shadow hover:shadow-lg transition-all duration-300;
+}
+
+/* Custom card styles */
+.card {
+  @apply bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700 transition-colors duration-500;
+}
+
+/* Custom input styles */
+.input-field {
+  @apply w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors duration-500;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
 }
