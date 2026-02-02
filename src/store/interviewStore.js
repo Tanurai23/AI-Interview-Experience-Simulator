@@ -9,7 +9,10 @@ const MAX_SCORE_PER_QUESTION = 10;
 const useInterviewStore = create((set, get) => ({
   /* ================= INTERVIEW FLOW ================= */
   currentIndex: 0,
+  totalQuestions: 0,
   answers: {},
+
+  setTotalQuestions: (count) => set({ totalQuestions: count }),
 
   saveAnswer: (index, answer) =>
     set((state) => ({
@@ -17,9 +20,12 @@ const useInterviewStore = create((set, get) => ({
     })),
 
   nextQuestion: () =>
-    set((state) => ({
-      currentIndex: state.currentIndex + 1,
-    })),
+    set((state) => {
+      if (state.currentIndex + 1 >= state.totalQuestions) {
+        return state;
+      }
+      return { currentIndex: state.currentIndex + 1 };
+    }),
 
   resetInterview: () =>
     set({
@@ -57,7 +63,8 @@ const useInterviewStore = create((set, get) => ({
 
     const newSession = {
       id: Date.now(),
-      date: new Date().toLocaleString(),
+      startedAt: new Date().toISOString(),
+      endedAt: new Date().toISOString(),
       totalQuestions: results.length,
       averageScore,
       results,

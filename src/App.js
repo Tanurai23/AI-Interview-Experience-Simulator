@@ -79,15 +79,17 @@ function App() {
   };
 
   return (
-    <div className={`${isDark ? "dark" : ""} min-h-screen h-screen overflow-hidden bg-white dark:bg-[#0f172a] transition-colors duration-500`}>
-      {/* HEADER - Fixed */}
-      <Header
-        currentScreen={screen}
-        onHome={() => setScreen("landing")}
-      />
+    <div className={`${isDark ? "dark" : ""} fixed inset-0 overflow-hidden bg-white dark:bg-[#0f172a] transition-colors duration-500`}>
+      {/* HEADER - Fixed at top */}
+      <div className="fixed top-0 left-0 right-0 z-10">
+        <Header
+          currentScreen={screen}
+          onHome={() => setScreen("landing")}
+        />
+      </div>
 
-      {/* MAIN CONTENT - Fixed height, no scroll */}
-      <main className="h-[calc(100vh-80px)] overflow-y-auto flex justify-center px-4 py-6 md:py-12">
+      {/* MAIN CONTENT - NO SCROLL, fixed height */}
+      <main className="absolute top-[80px] bottom-0 left-0 right-0 overflow-hidden flex justify-center px-4 py-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={screen}
@@ -96,7 +98,7 @@ function App() {
             exit={{ opacity: 0, y: -24 }}
             transition={{ duration: 0.4, ease: "easeInOut" }}
             className="
-              w-full max-w-5xl h-fit
+              w-full max-w-5xl h-full overflow-y-auto
               bg-white/80 dark:bg-slate-800/50
               backdrop-blur-xl
               border border-slate-200 dark:border-slate-700
@@ -111,9 +113,9 @@ function App() {
         </AnimatePresence>
       </main>
 
-      {/* FOOTER ACTION - Fixed at bottom when visible */}
-      {screen !== "landing" && screen !== "interview" && (
-        <footer className="fixed bottom-0 left-0 right-0 text-center pb-6 bg-gradient-to-t from-white dark:from-[#0f172a] to-transparent pt-8">
+      {/* FOOTER ACTION - Only show on specific screens */}
+      {screen !== "landing" && screen !== "interview" && screen !== "complete" && screen !== "analytics" && (
+        <div className="fixed bottom-0 left-0 right-0 z-10 text-center pb-8 bg-gradient-to-t from-white dark:from-[#0f172a] to-transparent pt-8">
           <button
             onClick={() => setScreen("history")}
             className="
@@ -127,7 +129,7 @@ function App() {
           >
             View History
           </button>
-        </footer>
+        </div>
       )}
     </div>
   );
