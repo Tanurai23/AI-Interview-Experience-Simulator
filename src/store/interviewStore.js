@@ -1,94 +1,69 @@
 import { create } from "zustand";
 
-/* ---------------- LOAD SAVED SESSIONS ---------------- */
-const savedSessions =
-  JSON.parse(localStorage.getItem("interviewSessions")) || [];
-
+const savedSessions = JSON.parse(localStorage.getItem("interviewSessions")) || [];
 const MAX_SCORE_PER_QUESTION = 10;
 
 const useInterviewStore = create((set, get) => ({
-  /* ================= INTERVIEW FLOW ================= */
-  currentIndex: 0,
-  totalQuestions: 0,
-  answers: {},
-
-  setTotalQuestions: (count) => set({ totalQuestions: count }),
-
-  saveAnswer: (index, answer) =>
-    set((state) => ({
-      answers: { ...state.answers, [index]: answer },
-    })),
-
-  nextQuestion: () =>
-    set((state) => {
-      if (state.currentIndex + 1 >= state.totalQuestions) {
-        return state;
-      }
-      return { currentIndex: state.currentIndex + 1 };
-    }),
-
-  resetInterview: () =>
-    set({
-      currentIndex: 0,
-      answers: {},
-      results: [],
-      lastResults: [],
-    }),
-
-  /* ================= AI RESULTS ================= */
+  /* ================= STATE ================= */
   results: [],
   lastResults: [],
+  sessions: savedSessions,
 
+  /* ================= SAVE RESULT ================= */
   addResult: (result) =>
     set((state) => ({
       results: [...state.results, result],
     })),
 
-  /* ================= SESSION HISTORY ================= */
-  sessions: savedSessions,
+  /* ================= FINISH INTERVIEW ================= */
+  finishInterview: (answers) => {
+    // Use passed answers instead of store results
+    const resultsToSave = answers || get().results;
 
-  finishInterview: () => {
-    const { results, sessions } = get();
+    if (!resultsToSave || resultsToSave.length === 0) {
+      console.error("⚠️ No results to save!");
+      return;
+    }
 
-    if (!results.length) return;
-
-    const totalScore = results.reduce(
-      (sum, r) => sum + (r.score || 0),
-      0
-    );
-
+    const totalScore = resultsToSave.reduce((sum, r) => sum + (r.score || 0), 0);
     const averageScore = Math.round(
-      (totalScore / (results.length * MAX_SCORE_PER_QUESTION)) * 100
+      (totalScore / (resultsToSave.length * MAX_SCORE_PER_QUESTION)) * 100
     );
 
     const newSession = {
       id: Date.now(),
+      date: new Date().toLocaleString(), // ✅ FIXED: Added date field
       startedAt: new Date().toISOString(),
       endedAt: new Date().toISOString(),
-      totalQuestions: results.length,
+      totalQuestions: resultsToSave.length,
       averageScore,
-      results,
+      results: resultsToSave,
     };
 
-    const updatedSessions = [newSession, ...sessions];
+    const updatedSessions = [newSession, ...get().sessions];
 
-    localStorage.setItem(
-      "interviewSessions",
-      JSON.stringify(updatedSessions)
-    );
+    localStorage.setItem("interviewSessions", JSON.stringify(updatedSessions));
 
     set({
       sessions: updatedSessions,
-      lastResults: results,
+      lastResults: resultsToSave, // ✅ Set BEFORE navigation
       results: [],
-      currentIndex: 0,
-      answers: {},
     });
+
+    console.log("✅ Session saved:", newSession);
   },
 
+  /* ================= RESET ================= */
+  resetInterview: () =>
+    set({
+      results: [],
+      lastResults: [],
+    }),
+
+  /* ================= CLEAR ALL ================= */
   clearSessions: () => {
     localStorage.removeItem("interviewSessions");
-    set({ sessions: [] });
+    set({ sessions: [], lastResults: [], results: [] });
   },
 }));
 

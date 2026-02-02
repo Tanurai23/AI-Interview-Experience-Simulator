@@ -24,7 +24,8 @@ function Home({ onStartInterview, onAnalytics }) {
           {/* AI Brain Image */}
           <div className="shrink-0">
             <img
-              src="/brain-ai.png"
+             
+             src="/Home.png"
               alt="AI Brain"
               className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl shadow-lg object-cover"
             />
@@ -33,7 +34,7 @@ function Home({ onStartInterview, onAnalytics }) {
           {/* Title & Actions */}
           <div className="flex flex-col items-center md:items-start text-center md:text-left w-full">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">
-              GoodSpace <span className="text-blue-600 dark:text-blue-400">AI</span>
+              Intervu<span className="text-blue-600 dark:text-blue-400">AI</span>
             </h1>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mt-1 sm:mt-2">
               AI Interview Experience Simulator

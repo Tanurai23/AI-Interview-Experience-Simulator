@@ -6,7 +6,7 @@ const Header = () => {
 
   return (
     <header className="flex justify-between items-center px-6 py-4">
-      <h1 className="font-bold text-xl">GoodSpace AI</h1>
+      <h1 className="font-bold text-xl">IntervuAI</h1>
 
     {/* RIGHT SIDE */}
   <div className="flex items-center gap-4">

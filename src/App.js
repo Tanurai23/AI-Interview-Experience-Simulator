@@ -13,17 +13,17 @@ import interviewConfig from "./data/interviewConfig";
 import questions from "./data/questions";
 
 import useThemeStore from "./store/themeStore";
+import useInterviewStore from "./store/interviewStore";
 
 function App() {
   const [screen, setScreen] = useState("landing");
 
-  // ✅ Properly consume theme state
   const { isDark } = useThemeStore();
+  const { finishInterview } = useInterviewStore();
 
-  // ✅ Sync theme with <html> and localStorage - NO FLICKER
+  // ✅ Sync theme
   useEffect(() => {
     const root = document.documentElement;
-
     if (isDark) {
       root.classList.add("dark");
       localStorage.setItem("theme", "dark");
@@ -32,6 +32,19 @@ function App() {
       localStorage.setItem("theme", "light");
     }
   }, [isDark]);
+
+  // ✅ Handle interview completion
+  const handleInterviewFinish = (answers) => {
+    console.log("📊 Interview finished with answers:", answers);
+    
+    // Save to store FIRST
+    finishInterview(answers);
+    
+    // Then navigate
+    setTimeout(() => {
+      setScreen("complete");
+    }, 100);
+  };
 
   const renderContent = () => {
     switch (screen) {
@@ -55,7 +68,7 @@ function App() {
         return (
           <InterviewScreen
             questions={questions}
-            onFinish={() => setScreen("complete")}
+            onFinish={handleInterviewFinish}
           />
         );
 
@@ -68,27 +81,24 @@ function App() {
         );
 
       case "history":
-        return <HistoryScreen />;
+        return <HistoryScreen onBack={() => setScreen("landing")} />;
 
       case "analytics":
         return <AnalyticsScreen onBack={() => setScreen("landing")} />;
 
       default:
-        return <div className="text-center">Screen not found</div>;
+        return <div className="text-center text-gray-900 dark:text-white">Screen not found</div>;
     }
   };
 
   return (
     <div className={`${isDark ? "dark" : ""} fixed inset-0 overflow-hidden bg-white dark:bg-[#0f172a] transition-colors duration-500`}>
-      {/* HEADER - Fixed at top */}
+      {/* HEADER */}
       <div className="fixed top-0 left-0 right-0 z-10">
-        <Header
-          currentScreen={screen}
-          onHome={() => setScreen("landing")}
-        />
+        <Header currentScreen={screen} onHome={() => setScreen("landing")} />
       </div>
 
-      {/* MAIN CONTENT - NO SCROLL, fixed height */}
+      {/* MAIN CONTENT */}
       <main className="absolute top-[80px] bottom-0 left-0 right-0 overflow-hidden flex justify-center px-4 py-6">
         <AnimatePresence mode="wait">
           <motion.div
@@ -113,11 +123,11 @@ function App() {
         </AnimatePresence>
       </main>
 
-      {/* FOOTER ACTION - Only show on specific screens */}
-      {screen !== "landing" && screen !== "interview" && screen !== "complete" && screen !== "analytics" && (
+      {/* FOOTER - Only for history */}
+      {screen === "history" && (
         <div className="fixed bottom-0 left-0 right-0 z-10 text-center pb-8 bg-gradient-to-t from-white dark:from-[#0f172a] to-transparent pt-8">
           <button
-            onClick={() => setScreen("history")}
+            onClick={() => setScreen("landing")}
             className="
               bg-blue-600 hover:bg-blue-500
               text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl
@@ -127,7 +137,7 @@ function App() {
               text-sm sm:text-base
             "
           >
-            View History
+            Back to Home
           </button>
         </div>
       )}
