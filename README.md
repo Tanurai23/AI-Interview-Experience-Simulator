@@ -53,7 +53,7 @@ serverless APIs without frontend changes.
 5. Performance summary is shown
 
 ## 🚀 Live Demo
-https://ai-interview-simulator.vercel.app
+https://ai-interview-experience-simulator.vercel.app/
 
 ## 📦 Installation
 ```bash
